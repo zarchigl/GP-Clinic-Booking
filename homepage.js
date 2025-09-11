@@ -9,9 +9,9 @@ import rawData from "./healthcare.json";
 
 
 // ✅ Replace these paths with where your images actually live
-import consultationImg from "../Images/consultation.jpg";
-import vaccinationImg from "../Images/vaccination.jpeg";
-import medicalCheckupImg from "../Images/medicalCheckup.jpg";
+import consultationImg from "./Images/consultation.jpg";
+import vaccinationImg from "./Images/vaccination.jpeg";
+import medicalCheckupImg from "./Images/medicalCheckup.jpg";
 
 const services = [
   {
