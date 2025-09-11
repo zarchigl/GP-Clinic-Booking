@@ -1,360 +1,471 @@
 import React, { useState } from "react";
+
 import "./AppointmentForm.css";
+ 
+/**
 
-export default function AppointmentForm() {
-  const [form, setForm] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    service: "",
-    date: "",
-    shift: "",
-    emergencyName: "",
-    emergencyPhone: "",
-    notes: "",
-    doctor : "",
-  });
+* Build the API URL defensively:
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
-  };
+* - If REACT_APP_APPT_API is a full endpoint (…/dev/book-appointment) → use it as-is
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Basic client-side check
-    const required = [
-      "fullName",
-      "email",
-      "phone",
-      "service",
-      "date",
-      "shift",
-      "emergencyName",
-      "emergencyPhone",
-      "doctor",
-    ];
-    const missing = required.filter((k) => !form[k]?.trim());
-    if (missing.length) {
-      alert("Please fill in all required fields.");
-      return;
-    }
-    // You can replace this with your API call
-    console.log("Form submitted:", form);
-    alert("Thanks! We’ll confirm your appointment within 24 hours.");
-    // setForm({...}) // optionally reset
-  };
+* - If REACT_APP_APPT_API is a stage base (…/dev) → append /book-appointment
 
-  return (
-    <main className="appt-root">
-      <section className="appt-card">
-        <header className="appt-header">
-          <h1 className="appt-title">Appointment Booking Form</h1>
-          <p className="appt-note">
-            When you submit this form, it will not automatically collect your
-            details like name and email address unless you provide it yourself.
-          </p>
-        </header>
+* - If not set → use a safe default with /dev/book-appointment
 
-        <div className="appt-required">* Required</div>
+*/
 
-        <h2 className="appt-section">Booking details</h2>
-        <p className="appt-subnote">
-          By submitting this form, you agree to be contacted regarding your
-          appointment. We will confirm your appointment within 24 hours. If you
-          do not receive confirmation, please contact us directly.
-        </p>
+function buildApiUrl() {
 
-        <form className="appt-form" onSubmit={handleSubmit} noValidate>
-          {/* 1. Full Name */}
-          <div className="field">
-            <label className="label" htmlFor="fullName">
-              <span className="num">1.</span> Full Name{" "}
-              <span aria-hidden="true" className="req">
-                *
-              </span>
-            </label>
-            <input
-              id="fullName"
-              name="fullName"
-              type="text"
-              className="input"
-              placeholder="Enter your answer"
-              value={form.fullName}
-              onChange={handleChange}
-              required
-            />
-          </div>
+  const DEFAULT =
 
-          {/* 2. Email */}
-          <div className="field">
-            <label className="label" htmlFor="email">
-              <span className="num">2.</span> Email Address{" "}
-              <span aria-hidden="true" className="req">
-                *
-              </span>
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              className="input"
-              placeholder="Enter your answer"
-              value={form.email}
-              onChange={handleChange}
-              required
-            />
-          </div>
+    "https://qwo836tyv1.execute-api.us-east-1.amazonaws.com/dev/book-appointment";
+ 
+  const base = process.env.REACT_APP_APPT_API;
 
-          {/* 3. Contact Number */}
-          <div className="field">
-            <label className="label" htmlFor="phone">
-              <span className="num">3.</span> Contact Number{" "}
-              <span aria-hidden="true" className="req">
-                *
-              </span>
-            </label>
-            <input
-              id="phone"
-              name="phone"
-              type="tel"
-              className="input"
-              placeholder="Enter your answer"
-              value={form.phone}
-              onChange={handleChange}
-              required
-            />
-          </div>
+  if (!base) return DEFAULT;
+ 
+  const cleaned = base.replace(/\/+$/, ""); // strip trailing slash(es)
 
-          {/* 4. Service (radios) */}
-          <fieldset className="field">
-            <legend className="label">
-              <span className="num">4.</span> Service{" "}
-              <span aria-hidden="true" className="req">
-                *
-              </span>
-            </legend>
+  if (cleaned.endsWith("/book-appointment")) return cleaned;
 
-            <div className="radios">
-              <label className="radio">
-                <input
-                  type="radio"
-                  name="service"
-                  value="GP Consultation"
-                  checked={form.service === "GP Consultation"}
-                  onChange={handleChange}
-                  required
-                />
-                <span>GP Consultation</span>
-              </label>
+  return `${cleaned}/book-appointment`;
 
-              <label className="radio">
-                <input
-                  type="radio"
-                  name="service"
-                  value="Vaccination"
-                  checked={form.service === "Vaccination"}
-                  onChange={handleChange}
-                  required
-                />
-                <span>Vaccination</span>
-              </label>
-
-              <label className="radio">
-                <input
-                  type="radio"
-                  name="service"
-                  value="Medical checkup"
-                  checked={form.service === "Medical checkup"}
-                  onChange={handleChange}
-                  required
-                />
-                <span>Medical checkup</span>
-              </label>
-            </div>
-          </fieldset>
-
-          {/* 5. Appointment Date */}
-          <div className="field">
-            <label className="label" htmlFor="date">
-              <span className="num">5.</span> Appointment Date{" "}
-              <span aria-hidden="true" className="req">
-                *
-              </span>
-            </label>
-            <input
-              id="date"
-              name="date"
-              type="date"
-              className="input"
-              placeholder="Please input date (M/d/yyyy)"
-              value={form.date}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          {/* 6. Preferred shift (radios) */}
-          <fieldset className="field">
-            <legend className="label">
-              <span className="num">6.</span> Preferred Time slot{" "}
-              <span aria-hidden="true" className="req">
-                *
-              </span>
-            </legend>
-
-            <div className="radios">
-              <label className="radio">
-                <input
-                  type="radio"
-                  name="shift"
-                  value="8-9"
-                  checked={form.shift === "8-9"}
-                  onChange={handleChange}
-                  required
-                />
-                <span>8am -9am</span>
-              </label>
-
-              <label className="radio">
-                <input
-                  type="radio"
-                  name="shift"
-                  value="9-10"
-                  checked={form.shift === "9-10"}
-                  onChange={handleChange}
-                  required
-                />
-                <span>9am -10am</span>
-              </label>
-
-              <label className="radio">
-                <input
-                  type="radio"
-                  name="shift"
-                  value="10-11"
-                  checked={form.shift === "10-11"}
-                  onChange={handleChange}
-                  required
-                />
-                <span>10am -11am</span>
-              </label>
-
-              <label className="radio">
-                <input
-                  type="radio"
-                  name="shift"
-                  value="11-12"
-                  checked={form.shift === "11-12"}
-                  onChange={handleChange}
-                  required
-                />
-                <span>11am -12pm</span>
-              </label>
-
-              <label className="radio">
-                <input
-                  type="radio"
-                  name="shift"
-                  value="2-3"
-                  checked={form.shift === "2-3"}
-                  onChange={handleChange}
-                  required
-                />
-                <span>2pm - 3pm</span>
-              </label>
-
-<label className="radio">
-                <input
-                  type="radio"
-                  name="shift"
-                  value="3-4"
-                  checked={form.shift === "3-4"}
-                  onChange={handleChange}
-                  required
-                />
-                <span>3pm - 4pm</span>
-              </label>
-
-              <label className="radio">
-                <input
-                  type="radio"
-                  name="shift"
-                  value="4-5"
-                  checked={form.shift === "4-5"}
-                  onChange={handleChange}
-                  required
-                />
-                <span>4pm - 5pm</span>
-              </label>
-
-            </div>
-          </fieldset>
-
-          {/* 7. Emergency Contact Name */}
-          <div className="field">
-            <label className="label" htmlFor="emergencyName">
-              <span className="num">7.</span> Emergency Contact Name{" "}
-              <span aria-hidden="true" className="req">
-                *
-              </span>
-            </label>
-            <input
-              id="emergencyName"
-              name="emergencyName"
-              type="text"
-              className="input"
-              placeholder="Enter your answer"
-              value={form.emergencyName}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          {/* 8. Emergency Contact Number */}
-          <div className="field">
-            <label className="label" htmlFor="emergencyPhone">
-              <span className="num">8.</span> Emergency Contact Number{" "}
-              <span aria-hidden="true" className="req">
-                *
-              </span>
-            </label>
-            <input
-              id="emergencyPhone"
-              name="emergencyPhone"
-              type="tel"
-              className="input"
-              placeholder="Enter your answer"
-              value={form.emergencyPhone}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          {/* 9. Additional Information */}
-          <div className="field">
-            <label className="label" htmlFor="notes">
-              <span className="num">9.</span> Additional Information
-            </label>
-            <textarea
-              id="notes"
-              name="notes"
-              className="textarea"
-              placeholder="Enter your answer"
-              rows={4}
-              value={form.notes}
-              onChange={handleChange}
-            />
-          </div>
-
-          {/* Submit */}
-          <div className="submit-row">
-            <button type="submit" className="btn-primary">
-              Submit
-            </button>
-          </div>
-        </form>
-      </section>
-    </main>
-  );
 }
+ 
+export default function AppointmentForm() {
+
+  const [form, setForm] = useState({
+
+    fullName: "",
+
+    email: "",
+
+    phone: "",
+
+    service: "",
+
+    date: "",
+
+    shift: "",
+
+    emergencyName: "",
+
+    emergencyPhone: "",
+
+    notes: "",
+
+  });
+ 
+  const [message, setMessage] = useState(null);
+
+  const [messageType, setMessageType] = useState("");
+
+  const [submitting, setSubmitting] = useState(false);
+ 
+  const handleChange = (e) => {
+
+    const { name, value } = e.target;
+
+    setForm((f) => ({ ...f, [name]: value }));
+
+    // keep the message visible until submit attempt; remove this line if you prefer immediate clear
+
+    // setMessage(null);
+
+  };
+ 
+  const handleSubmit = async (e) => {
+
+    e.preventDefault();
+
+    if (submitting) return;
+
+    setSubmitting(true);
+ 
+    const requiredFields = [
+
+      "fullName",
+
+      "email",
+
+      "phone",
+
+      "service",
+
+      "date",
+
+      "shift",
+
+      "emergencyName",
+
+      "emergencyPhone",
+
+    ];
+ 
+    const missing = requiredFields.filter((field) => !form[field]?.trim());
+
+    if (missing.length) {
+
+      setMessageType("error");
+
+      setMessage(`Please fill in all required fields: ${missing.join(", ")}`);
+
+      setSubmitting(false);
+
+      return;
+
+    }
+ 
+    const payload = {
+
+      fullName: form.fullName.trim(),
+
+      email: form.email.trim(),
+
+      contactNumber: form.phone.trim(),
+
+      service: form.service,
+
+      appointmentDate: form.date,
+
+      timeSlot: form.shift,
+
+      emergencyName: form.emergencyName.trim(),
+
+      emergencyNumber: form.emergencyPhone.trim(),
+
+      additionalInfo: form.notes?.trim() || "",
+
+    };
+ 
+    const url = buildApiUrl();
+
+    if (process.env.NODE_ENV !== "production") {
+
+      // helpful when chasing the missing /dev case
+
+      // eslint-disable-next-line no-console
+
+      console.log("POST URL:", url);
+
+    }
+ 
+    try {
+
+      const response = await fetch(url, {
+
+        method: "POST",
+
+        headers: {
+
+          "Content-Type": "application/json",
+
+          Accept: "application/json",
+
+        },
+
+        body: JSON.stringify(payload),
+
+      });
+ 
+      // Be tolerant of non-JSON or empty bodies
+
+      let data = null;
+
+      try {
+
+        data = await response.json();
+
+      } catch {
+
+        data = null;
+
+      }
+ 
+      if (response.ok) {
+
+        setMessageType("success");
+
+        setMessage("✅ Appointment booked successfully!");
+
+        setForm({
+
+          fullName: "",
+
+          email: "",
+
+          phone: "",
+
+          service: "",
+
+          date: "",
+
+          shift: "",
+
+          emergencyName: "",
+
+          emergencyPhone: "",
+
+          notes: "",
+
+        });
+
+      } else {
+
+        setMessageType("error");
+
+        setMessage(`⚠️ ${data?.message || `Request failed (${response.status})`}`);
+
+      }
+
+    } catch (err) {
+
+      // eslint-disable-next-line no-console
+
+      console.error("Network or server error:", err);
+
+      setMessageType("error");
+
+      setMessage("Failed to book appointment. Please try again later.");
+
+    } finally {
+
+      setSubmitting(false);
+
+    }
+
+  };
+ 
+  // Note: this formatter still assumes "2-3" means 2am–3am; switching to 24h values is recommended.
+
+  const formatShift = (shift) => {
+
+    const [start, end] = shift.split("-");
+
+    const formatHour = (h) => (h > 12 ? `${h - 12}pm` : `${h}am`);
+
+    return `${formatHour(parseInt(start, 10))} - ${formatHour(parseInt(end, 10))}`;
+
+  };
+ 
+  return (
+<main className="appt-root">
+<section className="appt-card">
+<header className="appt-header">
+<h1 className="appt-title">Appointment Booking Form</h1>
+<p className="appt-note">
+
+            By submitting this form, you agree to be contacted regarding your appointment.
+</p>
+</header>
+ 
+        {message && (
+<div className={`appt-message ${messageType}`} role="status" aria-live="polite">
+
+            {message}
+</div>
+
+        )}
+ 
+        <form className="appt-form" onSubmit={handleSubmit} noValidate>
+<div className="field">
+<label htmlFor="fullName">Full Name *</label>
+<input
+
+              id="fullName"
+
+              name="fullName"
+
+              type="text"
+
+              value={form.fullName}
+
+              onChange={handleChange}
+
+              required
+
+            />
+</div>
+ 
+          <div className="field">
+<label htmlFor="email">Email *</label>
+<input
+
+              id="email"
+
+              name="email"
+
+              type="email"
+
+              value={form.email}
+
+              onChange={handleChange}
+
+              required
+
+            />
+</div>
+ 
+          <div className="field">
+<label htmlFor="phone">Contact Number *</label>
+<input
+
+              id="phone"
+
+              name="phone"
+
+              type="tel"
+
+              value={form.phone}
+
+              onChange={handleChange}
+
+              required
+
+            />
+</div>
+ 
+          <fieldset className="field">
+<legend>Service *</legend>
+
+            {["GP Consultation", "Vaccination", "Medical checkup"].map((s) => (
+<label key={s}>
+<input
+
+                  type="radio"
+
+                  name="service"
+
+                  value={s}
+
+                  checked={form.service === s}
+
+                  onChange={handleChange}
+
+                  required
+
+                />
+
+                {s}
+</label>
+
+            ))}
+</fieldset>
+ 
+          <div className="field">
+<label htmlFor="date">Appointment Date *</label>
+<input
+
+              id="date"
+
+              name="date"
+
+              type="date"
+
+              value={form.date}
+
+              onChange={handleChange}
+
+              required
+
+            />
+</div>
+ 
+          <fieldset className="field">
+<legend>Preferred Time Slot *</legend>
+
+            {["8-9", "9-10", "10-11", "11-12", "2-3", "3-4", "4-5"].map((shift) => (
+<label key={shift}>
+<input
+
+                  type="radio"
+
+                  name="shift"
+
+                  value={shift}
+
+                  checked={form.shift === shift}
+
+                  onChange={handleChange}
+
+                  required
+
+                />
+
+                {formatShift(shift)}
+</label>
+
+            ))}
+</fieldset>
+ 
+          <div className="field">
+<label htmlFor="emergencyName">Emergency Contact Name *</label>
+<input
+
+              id="emergencyName"
+
+              name="emergencyName"
+
+              type="text"
+
+              value={form.emergencyName}
+
+              onChange={handleChange}
+
+              required
+
+            />
+</div>
+ 
+          <div className="field">
+<label htmlFor="emergencyPhone">Emergency Contact Number *</label>
+<input
+
+              id="emergencyPhone"
+
+              name="emergencyPhone"
+
+              type="tel"
+
+              value={form.emergencyPhone}
+
+              onChange={handleChange}
+
+              required
+
+            />
+</div>
+ 
+          <div className="field">
+<label htmlFor="notes">Additional Information</label>
+<textarea
+
+              id="notes"
+
+              name="notes"
+
+              rows={4}
+
+              value={form.notes}
+
+              onChange={handleChange}
+
+            />
+</div>
+ 
+          <div className="submit-row">
+<button type="submit" className="btn-primary" disabled={submitting}>
+
+              {submitting ? "Submitting…" : "Submit"}
+</button>
+</div>
+</form>
+</section>
+</main>
+
+  );
+
+}
+
+ 
+
