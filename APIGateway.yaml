@@ -1,0 +1,179 @@
+Resources:
+#Create DynamoDB Table
+  MyDynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: MyTable01
+      PartitionKey:
+        Name: Email
+        Type: S
+        Tags:
+        - Key: Name
+          Value: DDB002
+
+#Create Lambda Function
+  MyLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: GPLambdaFunction
+      Handler: index.handler
+      Role: !GetAtt MyLambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          def handler(event, context):
+              return {
+                  'statusCode': 200,
+                  'body': 'Hello from Lambda!'
+              }
+      Runtime: nodejs22.x
+      Timeout: 10
+      MemorySize: 128
+      Tags:
+        - Key: Name
+          Value: GPLMB001
+
+#Lambda Execution Role
+  MyLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: GPLambdaExecutionRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaDynamoDBPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:GetItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:DeleteItem
+                Resource: !GetAtt MyDynamoDBTable.Arn
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: arn:aws:logs:*:*:*
+      Tags:
+        - Key: Name
+          Value: GPLMBRole001
+
+#Create API Gateway
+  MyApiGateway:
+    Type: AWS::ApiGateway::HttpApi
+    Properties:
+      Name: GPApiGateway
+      Description: API Gateway for Lambda integration
+      Tags:
+        - Key: Name
+          Value: GPAPIGW001
+      CorsConfiguration:
+        AllowOrigins:
+          - '*'
+        AllowMethods:
+          - GET
+          - POST
+          - OPTIONS
+        AllowHeaders:
+          - '*'
+  
+#API Gateway Integration with Lambda
+  MyApiIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref MyApiGateway
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations
+      PayloadFormatVersion: '2.0'
+      IntegrationMethod: POST
+      Tags:
+        - Key: Name
+          Value: GPAPIGWInt001
+  
+#API Gateway Route for Get Method
+  MyApiRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref MyApiGateway
+      RouteKey: GET /book-appointment
+      Target: !Sub integrations/${MyApiIntegration}
+      Tags:
+        - Key: Name
+          Value: GPAPIGWRoute001 
+
+#API Gateway Route for Post Method
+  MyApiPostRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref MyApiGateway 
+      RouteKey: POST /book-appointment
+      Target: !Sub integrations/${MyApiIntegration}
+      Tags:
+        - Key: Name
+          Value: GPAPIGWPostRoute001
+
+#API Gateway Route for Options Method
+  MyApiOptionsRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref MyApiGateway 
+      RouteKey: OPTIONS /book-appointment
+      Target: !Sub integrations/${MyApiIntegration}
+      Tags:
+        - Key: Name
+          Value: GPAPIGWOptionsRoute001
+
+#API Stage
+  MyApiStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref MyApiGateway
+      StageName: prod
+      AutoDeploy: true
+      Tags:
+        - Key: Name
+          Value: GPAPIGWStage001
+
+#Permission for API Gateway to invoke Lambda
+  MyLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref MyLambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${MyApiGateway}/*
+      Tags:
+        - Key: Name
+          Value: GPLMBPerm001
+
+#API Gateway Deployment
+  MyApiDeployment:
+    Type: AWS::ApiGatewayV2::Deployment
+    Properties:
+      ApiId: !Ref MyApiGateway
+      Tags:
+        - Key: Name
+          Value: GPAPIGWDep001
+    
+ 
+
+Outputs:
+  DynamoDBTableName:
+    Description: "DynamoDB Table Name"
+    Value: !Ref MyDynamoDBTable
+  LambdaFunctionName:
+    Description: "Lambda Function Name"
+    Value: !Ref MyLambdaFunction
+  ApiGatewayUrl:
+    Description: "API Gateway URL"
+    Value: !Sub https://${MyApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/book-appointment
+ 
+  

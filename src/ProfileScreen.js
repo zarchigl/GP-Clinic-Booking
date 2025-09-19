@@ -33,14 +33,6 @@ export default function ProfileScreen() {
             </div>
 
             <div className="row">
-              <div className="label">Address:</div>
-              <div className="value">
-                <div>{user.address1}</div>
-                <div>{user.address2}</div>
-              </div>
-            </div>
-
-            <div className="row">
               <div className="label">Appointments:</div>
               <div className="value">{user.appointment}</div>
             </div>

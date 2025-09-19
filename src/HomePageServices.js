@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
-import consultationImg from "../Images/consultation.jpg";
-import vaccinationImg from "../Images/vaccination.jpeg";
-import medicalCheckupImg from "../Images/medicalCheckup.jpg";
+import consultationImg from "./Images/consultation.jpg";
+import vaccinationImg from "./Images/vaccination.jpeg";
+import medicalCheckupImg from "./Images/medicalCheckup.jpg";
 import "./HomePageServices.css";
 
 const services = [

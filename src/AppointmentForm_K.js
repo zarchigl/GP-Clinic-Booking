@@ -18,7 +18,7 @@ function buildApiUrl() {
 
   const DEFAULT =
 
-    "https://qwo836tyv1.execute-api.us-east-1.amazonaws.com/dev/book-appointment";
+    "https://p8f60upw9c.execute-api.us-east-1.amazonaws.com/dev/book-appointment";
  
   const base = process.env.REACT_APP_APPT_API;
 
@@ -81,6 +81,8 @@ export default function AppointmentForm() {
     if (submitting) return;
 
     setSubmitting(true);
+    
+    console.log("Form values on submit:", form);
  
     const requiredFields = [
 
@@ -104,6 +106,12 @@ export default function AppointmentForm() {
  
     const missing = requiredFields.filter((field) => !form[field]?.trim());
 
+    // const missing = requiredFields.filter((field) => {
+    // const value = form[field];
+    // return typeof value === "string" ? !value.trim() : !value;
+    
+    // });
+
     if (missing.length) {
 
       setMessageType("error");
@@ -115,7 +123,8 @@ export default function AppointmentForm() {
       return;
 
     }
- 
+
+
     const payload = {
 
       fullName: form.fullName.trim(),

@@ -1,6 +1,24 @@
 import React, { useState } from "react";
 import "./AppointmentForm.css";
 
+function buildApiUrl() {
+
+  const DEFAULT =
+
+    "https://p8f60upw9c.execute-api.us-east-1.amazonaws.com/dev/book-appointment";
+ 
+  const base = process.env.REACT_APP_APPT_API;
+
+  if (!base) return DEFAULT;
+ 
+  const cleaned = base.replace(/\/+$/, ""); // strip trailing slash(es)
+
+  if (cleaned.endsWith("/book-appointment")) return cleaned;
+
+  return `${cleaned}/book-appointment`;
+
+}
+
 export default function AppointmentForm() {
   const [form, setForm] = useState({
     fullName: "",
@@ -12,7 +30,6 @@ export default function AppointmentForm() {
     emergencyName: "",
     emergencyPhone: "",
     notes: "",
-    doctor : "",
   });
 
   const handleChange = (e) => {
@@ -32,7 +49,7 @@ export default function AppointmentForm() {
       "shift",
       "emergencyName",
       "emergencyPhone",
-      "doctor",
+      // "doctor",
     ];
     const missing = required.filter((k) => !form[k]?.trim());
     if (missing.length) {
