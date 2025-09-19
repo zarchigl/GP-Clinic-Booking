@@ -1,0 +1,9 @@
+curl -i -X POST "https://llbi3z0e1e.execute-api.us-east-1.amazonaws.com/prod/book-appointment" \
+  -H "Origin: https://main.d2tgac5p3lij3.amplifyapp.com" \
+  -H "Content-Type: application/json" \
+  -d '{"fullName":"Local Test User","email":"local@example.com","contactNumber":"1234567890","service":"GP Consultation","appointmentDate":"2025-09-20","timeSlot":"9 AM","emergencyName":"Emergency Contact","emergencyNumber":"9876543210","additionalInfo":"Testing local React app"}'
+
+
+curl -i -X OPTIONS "https://llbi3z0e1e.execute-api.us-east-1.amazonaws.com/prod/book-appointment" \
+  -H "Origin: https://main.d2tgac5p3lij3.amplifyapp.com" \
+  -H "Content-Type: application/json" \
