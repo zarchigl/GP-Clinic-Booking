@@ -3,7 +3,7 @@ import "./AppointmentForm.css";
 
 function buildApiUrl() {
   const DEFAULT =
-    "https://p8f60upw9c.execute-api.us-east-1.amazonaws.com/dev/book-appointment";
+    "https://llbi3z0e1e.execute-api.us-east-1.amazonaws.com/prod/book-appointment";
 
   const base = process.env.REACT_APP_APPT_API;
   if (!base) return DEFAULT;
