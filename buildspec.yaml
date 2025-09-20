@@ -3,7 +3,7 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      nodejs: 18
+      nodejs: 22
   build:
     commands:
       - echo "Packaging only the backend folder to deploy to Lambda..."
