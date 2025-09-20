@@ -1,0 +1,14 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+  build:
+    commands:
+      - echo "Packaging only the backend folder to deploy to Lambda..."
+      - cd backend   # go inside your Lambda folder
+      - zip -r ../backend.zip .   # zip everything inside lambda/
+artifacts:
+  files:
+    - backend.zip
