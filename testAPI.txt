@@ -10,3 +10,8 @@ curl -i -X POST "https://mesemhk5nh.execute-api.us-east-1.amazonaws.com/prod/boo
 curl -i -X OPTIONS "https://mesemhk5nh.execute-api.us-east-1.amazonaws.com/prod/book-appointment" \
   -H "Origin: https://main.d2tgac5p3lij3.amplifyapp.com" \
   -H "Access-Control-Request-Method: POST"
+
+
+curl -i -X OPTIONS "https://mesemhk5nh.execute-api.us-east-1.amazonaws.com/prod/book-appointment" \
+  -H "Origin: https://main.d2tgac5p3lij3.amplifyapp.com" \
+  -H "Access-Control-Request-Method: GET"

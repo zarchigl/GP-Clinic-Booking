@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./AppointmentForm.css";
 
 function buildApiUrl() {
-  const DEFAULT = "https://ek77pc4txl.execute-api.us-east-1.amazonaws.com/prod/book-appointment"; // replace with your API endpoint
+  const DEFAULT = "https://brqwqx40uh.execute-api.us-east-1.amazonaws.com/prod"; // replace with your API endpoint
 
   const base = process.env.REACT_APP_APPT_API;
   if (!base) return DEFAULT;
